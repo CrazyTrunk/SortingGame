@@ -6,7 +6,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-public class DragController : MonoBehaviour
+public class DragController : Singleton<DragController>
 {
     private bool _isDragActive = false;
     private Vector2 _screenPos;
@@ -18,14 +18,6 @@ public class DragController : MonoBehaviour
     [SerializeField] EventSystem m_EventSystem;
     PointerEventData m_PointerEventData;
 
-    private void Awake()
-    {
-        DragController[] controllers = FindObjectsOfType<DragController>();
-        if (controllers.Length > 1)
-        {
-            Destroy(gameObject);
-        }
-    }
     private void Update()
     {
         if (_isDragActive)

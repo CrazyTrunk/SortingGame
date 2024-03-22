@@ -1,12 +1,13 @@
-using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class SlotController : MonoBehaviour
 {
     [SerializeField] private List<Slot> slots = new List<Slot>();
+    [SerializeField] private ItemDatas itemDatas;
+    [SerializeField] private GameObject itemPrefab;
     private List<Item> listItem = new List<Item>();
+
     private void Start()
     {
         Init();
@@ -14,21 +15,20 @@ public class SlotController : MonoBehaviour
     private void Init()
     {
         listItem.Clear();
+        var randomIndex = Random.Range(0, 2);
+        for (int i = 0; i < slots.Count; i++)
+        {
+            var item = Instantiate(itemPrefab);
+            item.transform.SetParent(gameObject.transform);
+            item.transform.localScale = Vector3.one;
+            item.transform.position = slots[i].transform.position;
+        }
     }
     public void AddItem(Slot slot, Item item)
     {
         if (IsSlotAvailable(slot))
         {
             listItem.Add(item);
-        }
-        if (CheckingSameItem())
-        {
-            Debug.Log("OK");
-        }
-        else
-        {
-            Debug.Log("Not meet");
-
         }
     }
     public bool IsSlotAvailable(Slot slot)
