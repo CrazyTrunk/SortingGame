@@ -79,6 +79,7 @@ public class DragController : Singleton<DragController>
     private void Drop()
     {
         UpdateDragStatus(false);
+        _lastDragged.CheckingDrop();
     }
     void UpdateDragStatus(bool isDragging)
     {

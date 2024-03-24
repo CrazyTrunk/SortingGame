@@ -11,81 +11,62 @@ public class Draggable : MonoBehaviour
     [SerializeField]
     private Collider2D _collider;
     private Item itemData;
-
+    private Transform shelfTransform;
     private float _movementTime = 15f;
     private Nullable<Vector3> _movementDestination;
+    private Slot currentSlotItem;
+    private bool isTrigger = false;
+    private bool canGoNext = false;
     private void Start()
     {
         itemData = GetComponent<Item>();
+        currentSlotItem = itemData.slot;
+        shelfTransform = GetComponentInParent<LayerController>().transform;
     }
     private void FixedUpdate()
     {
-        if (_movementDestination.HasValue)
+        if (IsDragging)
         {
-            if (IsDragging)
-            {
-                _movementDestination = null;
-                return;
-            }
-            if (transform.position == _movementDestination)
-            {
-                gameObject.layer = Layer.Default;
-                _movementDestination = null;
+            _movementDestination = null;
+            transform.SetParent(shelfTransform);
 
-            }
-            else
-            {
-                transform.position = Vector3.Lerp(transform.position, _movementDestination.Value, _movementTime * Time.deltaTime);
-            }
         }
 
     }
+    public void CheckingDrop()
+    {
+
+            transform.SetParent(currentSlotItem.transform);
+            transform.position = startPos;
+    }
     private void OnTriggerEnter2D(Collider2D other)
     {
-        //Draggable colliderDraggable = other.GetComponent<Draggable>();
-        //if (colliderDraggable != null && DragController.Instance.LastDragged.gameObject == gameObject)
-        //{
-        //    ColliderDistance2D colliderDistance2D = other.Distance(_collider);
-        //    Vector3 diff = new Vector3(colliderDistance2D.normal.x, colliderDistance2D.normal.y) * colliderDistance2D.distance;
-        //    transform.position -= diff;
-        //}
-        //if (other.CompareTag("DropAvailable"))
-        //{
-        //    _movementDestination = other.transform.position;
-        //    Slot currentSlot = other.GetComponent<Slot>();
-        //    if (currentSlot.isAvailable)
-        //    {
-        //        SlotController slotController = other.GetComponentInParent<SlotController>();
-        //        if (slotController != null)
-        //        {
-        //            slotController.AddItem(currentSlot, itemData);
-        //            currentSlot.isAvailable = false;
-        //            currentSlot.currentItemInslot = itemData;
-        //            currentSlot.tag = "DropUnavailable";
-        //        }
-        //    }
+        if (other.CompareTag("DropAvailable"))
+        {
+            _movementDestination = other.transform.position;
+            Slot currentSlot = other.GetComponent<Slot>();
+            if (currentSlot.isAvailable && !isTrigger)
+            {
+                SlotController slotController = other.GetComponentInParent<SlotController>();
+                if (slotController != null)
+                {
+                    isTrigger = true;
+                    slotController.AddItem(currentSlot, itemData);
+                    currentSlot.isAvailable = false;
+                    currentSlot.currentItemInslot = itemData;
+                    currentSlot.tag = "DropUnavailable";
+                    currentSlotItem = currentSlot;
+                    itemData.transform.SetParent(currentSlotItem.transform);
+                }
+            }
 
-        //}
-        //else if (other.CompareTag("DropUnavailable"))
-        //{
-        //    _movementDestination = startPos;
-        //}
+        }
     }
     private void OnTriggerExit2D(Collider2D other)
     {
-        //if (other.CompareTag("DropUnavailable"))
-        //{
-        //    Slot currentSlot = other.GetComponent<Slot>();
-        //    if (!currentSlot.isAvailable && currentSlot.currentItemInslot == itemData)
-        //    {
-        //        SlotController slotController = other.GetComponentInParent<SlotController>();
-        //        if (slotController != null)
-        //        {
-        //            slotController.RemoveItem(itemData);
-        //            currentSlot.isAvailable = true;
-        //            currentSlot.tag = "DropAvailable";
-        //        }
-        //    }
-        //}
+        if (other.CompareTag("DropAvailable"))
+        {
+            isTrigger = false;
+        }
     }
 }

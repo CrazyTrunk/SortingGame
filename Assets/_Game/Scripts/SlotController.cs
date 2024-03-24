@@ -16,51 +16,21 @@ public class SlotController : MonoBehaviour
     {
         listItem.Clear();
         var randomIndex = Random.Range(0, 2);
-        for (int i = 0; i < slots.Count; i++)
+        for (int i = 0; i <2; i++)
         {
-            var item = Instantiate(itemPrefab);
-            item.transform.SetParent(gameObject.transform);
+            var item = Instantiate(itemPrefab).GetComponent<Item>();
+            item.transform.SetParent(slots[i].transform);
             item.transform.localScale = Vector3.one;
-            item.transform.position = slots[i].transform.position;
+            item.transform.localPosition = Vector3.zero;
+            item.slot = slots[i];
         }
     }
     public void AddItem(Slot slot, Item item)
     {
-        if (IsSlotAvailable(slot))
-        {
-            listItem.Add(item);
-        }
+        listItem.Add(item);
+
     }
-    public bool IsSlotAvailable(Slot slot)
-    {
-        for (int i = 0; i < slots.Count; i++)
-        {
-            if (slots[i] == slot)
-            {
-                return slots[i].isAvailable;
-            }
-        }
-        return false;
-    }
-    public bool CheckingSameItem()
-    {
-        bool isSameItems = true;
-        if (listItem.Count == 0 || listItem.Count < 3)
-        {
-            isSameItems = false;
-            return isSameItems;
-        }
-        var firstItemId = listItem[0].id;
-        for (int i = 0; i < listItem.Count; i++)
-        {
-            if (listItem[i].id != firstItemId)
-            {
-                isSameItems = false;
-                break;
-            }
-        }
-        return isSameItems;
-    }
+
 
     public void RemoveItem(Item item)
     {
